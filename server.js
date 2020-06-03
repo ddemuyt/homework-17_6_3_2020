@@ -17,3 +17,42 @@ app.use(express.static("public"));
 
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", { useNewUrlParser: true });
 
+app.get("/api/workouts", (req, res) => {
+    db.Workout.find({})
+    .populate("exercises")
+      .then(dbWorkout => {
+        res.json(dbWorkout);
+      })
+      .catch(err => {
+        res.json(err);
+      });
+  });
+
+  app.get("/exercises", (req, res) => {
+    db.Exercise.find({})
+      .then(dbExercise => {
+        res.json(dbExercise);
+      })
+      .catch(err => {
+        res.json(err);
+      });
+  });
+
+
+  // May need to change { body } because of req.params.id
+app.post("/api/workouts/?id", ({ body }, res) => {
+  db.Exercise.create(body)
+    .then(({_id}) => db.Workout.findOneAndUpdate({}, { $push: { exercises: _id } }, { new: true }))
+    .then(dbWorkout => {
+      res.json(dbWorkout);
+    })
+    .catch(err => {
+      res.json(err);
+    });
+});
+
+
+
+app.listen(PORT, () => {
+    console.log(`App running on port ${PORT}!`);
+  });
