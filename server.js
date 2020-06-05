@@ -19,7 +19,7 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", { use
 
 app.get("/api/workouts", (req, res) => {
     db.Workout.find({})
-    .populate("exercises")
+//    .populate("Workouts")
       .then(dbWorkout => {
         res.json(dbWorkout);
       })
@@ -28,10 +28,12 @@ app.get("/api/workouts", (req, res) => {
       });
   });
 
-  app.get("/exercises", (req, res) => {
-    db.Exercise.find({})
-      .then(dbExercise => {
-        res.json(dbExercise);
+
+
+  app.get("/", (req, res) => {
+    db.Workout.find({})
+      .then(dbWorkout => {
+        res.json(dbWorkout);
       })
       .catch(err => {
         res.json(err);
@@ -40,9 +42,9 @@ app.get("/api/workouts", (req, res) => {
 
 
   // May need to change { body } because of req.params.id
-app.post("/api/workouts/?id", ({ body }, res) => {
-  db.Exercise.create(body)
-    .then(({_id}) => db.Workout.findOneAndUpdate({}, { $push: { exercises: _id } }, { new: true }))
+app.post("/api/workouts/:id", ({ body }, res) => {
+  db.Workout.create(body)
+    .then(({_id}) => db.Workout.findOneAndUpdate({}, { $push: { Workouts: _id } }, { new: true }))
     .then(dbWorkout => {
       res.json(dbWorkout);
     })
